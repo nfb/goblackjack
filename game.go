@@ -16,8 +16,9 @@ type BlackJackRound struct {
 	state           int
 	nextPlayerQuery string
 	// 0: require bet (transit to either 1 or 2 via valid bet),
-	// 1: first cards dealt normal, 2: dealer Aces, 3: player blackjack, 4: player 21
-	// 5: post dealt cards, 6: player hold, 7: player bust
+	// 10: first cards dealt normal, 11: player blackjack
+	// 20: post hit not bust, 21: bust
+	// 30: win, 31: push, 32: loose, 33: dealerbust win
 }
 
 func (bj *BlackJackRound) DealPlayer() {
@@ -32,13 +33,11 @@ func (bj *BlackJackRound) DealDealer() {
 	bj.cards = bj.cards[:deckSize-1] // should probably use a deckheight variable to reduce the copies going on, fun microbenchmark?
 }
 
-func (bj *BlackJackRound) PostDealCheck() {
-	var dealerhandvalues
-	playerhandvalue := BlackJackHandValues(bj.playerhand)
-	if len(dealerhand) {
-
-
-
+//func (bj *BlackJackRound) PostDealCheck() {
+//	var dealerhandvalues
+//	playerhandvalue := BlackJackHandValues(bj.playerhand)
+//	if len(dealerhand) {
+//
 
 func (bj *BlackJackRound) PrintGameState() {
 	fmt.Println("---")
@@ -67,7 +66,7 @@ func (bj *BlackJackRound) DealHand() {
 func (bj *BlackJackRound) SetPostDealState() {
 	// add in insurance buy offer on ace card 1
 	// add in player blackjack check
-	bj.state = 1
+	bj.state = 10
 	bj.nextPlayerQuery = "H(i)t, H(o)ld or (D)ouble"
 }
 
@@ -90,6 +89,30 @@ func (bj *BlackJackRound) HandleNormCards(input string) {
 	switch input {
 	case "i":
 		bj.DealPlayer()
+		if BlackJackHandBestValue(bj.playerhand) > 21 {
+			bj.state = 21
+			GameEnd("Bust")
+		} else {
+			bj.state = 20
+		}
+	case "o":
+		bj.DealDealer()
+		dealerhand := BlackJackHandBestValue(bj.dealerhand)
+		if dealerhand > 21 {
+			bj.state = 33
+			bj.nextPlayerQuery = "Dealerbust u win"
+		}
+		res := BlackJackHandBestValue(bj.playerhand) - dealerhand
+		if res > 0 {
+			bj.state = 30
+			bj.nextPlayerQuery = "You beat the dealer!"
+		} else if res == 0 {
+			bj.state = 31
+			bj.nextPlayerQuery = "Push, you draw"
+		} else {
+			bj.state = 32
+			bj.nextPlayerQuery = "You loose"
+		}
 	default:
 	}
 }
@@ -104,8 +127,19 @@ func (bj *BlackJackRound) StateTransit(input string) {
 		} else {
 			bj.nextPlayerQuery = "enter bet as integer number"
 		}
-	case 1:
+	case 10:
 		bj.HandleNormCards(input)
+	case 20:
+		bj.HandleNormCards(input)
+
+	case 30:
+		os.Exit(0)
+	case 31:
+		os.Exit(0)
+	case 32:
+		os.Exit(0)
+	case 33:
+		os.Exit(0)
 
 	default:
 		fmt.Println("ummM")
@@ -130,6 +164,12 @@ func (bj *BlackJackRound) GameLoop() {
 	}
 
 }
+
+func GameEnd(message string) {
+	fmt.Println(message)
+	os.Exit(0)
+}
+
 func main() {
 	fmt.Println("vim-go")
 	//fmt.Println(CardSuit["diamond"])
