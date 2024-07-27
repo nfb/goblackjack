@@ -1,4 +1,4 @@
-package main
+package pkg
 
 import (
 	"math/rand"
@@ -68,7 +68,7 @@ func genPictureCards(suit string) []ACard {
 	return clist
 }
 
-func gendeck() CardDeck {
+func Gendeck() CardDeck {
 	var cd CardDeck
 	for _, s := range suits {
 		//cd.Cards = slices.Concat(cd.Cards, genPictureCards(s))

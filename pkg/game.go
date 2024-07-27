@@ -1,7 +1,6 @@
-package main
+package pkg
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"slices"
@@ -9,28 +8,33 @@ import (
 )
 
 type BlackJackRound struct {
-	cards           []ACard
+	Cards           []ACard
 	playerhand      []ACard
 	dealerhand      []ACard
 	playerbet       int
 	state           int
 	nextPlayerQuery string
 	// 0: require bet (transit to either 1 or 2 via valid bet),
-	// 10: first cards dealt normal, 11: player blackjack
+	// 10: first Cards dealt normal, 11: player blackjack
 	// 20: post hit not bust, 21: bust
 	// 30: win, 31: push, 32: loose, 33: dealerbust win
 }
 
+type BlackJackAction struct {
+	Action int // 0 bet, 1 hit, 2 stand, 3 split, 4 double
+	Amount int
+}
+
 func (bj *BlackJackRound) DealPlayer() {
-	deckSize := len(bj.cards)
-	bj.playerhand = slices.Concat(bj.playerhand, bj.cards[deckSize-1:])
-	bj.cards = bj.cards[:deckSize-1] // should probably use a deckheight variable to reduce the copies going on, fun microbenchmark?
+	deckSize := len(bj.Cards)
+	bj.playerhand = slices.Concat(bj.playerhand, bj.Cards[deckSize-1:])
+	bj.Cards = bj.Cards[:deckSize-1] // should probably use a deckheight variable to reduce the copies going on, fun microbenchmark?
 }
 
 func (bj *BlackJackRound) DealDealer() {
-	deckSize := len(bj.cards)
-	bj.dealerhand = slices.Concat(bj.dealerhand, bj.cards[deckSize-1:])
-	bj.cards = bj.cards[:deckSize-1] // should probably use a deckheight variable to reduce the copies going on, fun microbenchmark?
+	deckSize := len(bj.Cards)
+	bj.dealerhand = slices.Concat(bj.dealerhand, bj.Cards[deckSize-1:])
+	bj.Cards = bj.Cards[:deckSize-1] // should probably use a deckheight variable to reduce the copies going on, fun microbenchmark?
 }
 
 //func (bj *BlackJackRound) PostDealCheck() {
@@ -148,36 +152,7 @@ func (bj *BlackJackRound) StateTransit(input string) {
 	}
 }
 
-func (bj *BlackJackRound) GameLoop() {
-	reader := bufio.NewReader(os.Stdin)
-	var input string
-	for {
-
-		bj.StateTransit(input)
-		bj.PrintGameState()
-		key, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		input = key[:len(key)-1]
-	}
-
-}
-
 func GameEnd(message string) {
 	fmt.Println(message)
 	os.Exit(0)
-}
-
-func main() {
-	fmt.Println("vim-go")
-	//fmt.Println(CardSuit["diamond"])
-	//c := gencard()
-	//fmt.Println(c.String())
-	d := gendeck()
-	d.ShuffleLots()
-	bj := BlackJackRound{}
-	bj.cards = d.Cards
-	bj.GameLoop()
 }

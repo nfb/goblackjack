@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <script>
+      // run this function when the document is loaded
+      function createCard(id,value){
+        const card = document.createElement("div");
+        card.id = id
+        card.arbfield = 0
+        card.className = "playercard"
+        const cardText = document.createTextNode(value);
+        card.appendChild(cardText);
+        document.querySelector("#game").appendChild(card);
+      }
+      window.onload = () => {
+        // create a couple of elements in an otherwise empty HTML page
+        // const heading = document.createElement("h1");
+        // const headingText = document.createTextNode("Big Head!");
+        createCard("test","meow1")
+        createCard("test","meow2")
+      };
+    </script>
+    <style>
+    #game {
+      display: inline-block;
+      width: 80%;
+      height 80%;
+      border: solid;
+    }
+    #game .playercard {
+      display: inline-block;
+      width: 80px;
+      height: 80px;
+      border: dotted;
+    }
+    </style>
+  </head>
+  <body>
+    <button onclick=createCard();> makecardlol</button>
+    <div id=game>
+    </div>
+  </body>
+</html>
