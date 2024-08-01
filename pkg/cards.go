@@ -18,6 +18,19 @@ type CardDeck struct {
 	Cards []ACard
 }
 
+var RiggedDeck []ACard = []ACard{
+	ACard{PictureCard: true, PictureType: "A"},
+	ACard{PictureCard: true, PictureType: "A"},
+	ACard{PictureCard: true, PictureType: "Q"},
+	ACard{PictureCard: true, PictureType: "Q"},
+	ACard{PictureCard: true, PictureType: "A"},
+	ACard{PictureCard: true, PictureType: "A"},
+	ACard{PictureCard: true, PictureType: "Q"},
+	ACard{PictureCard: true, PictureType: "Q"},
+	ACard{PictureCard: true, PictureType: "A"},
+	ACard{PictureCard: true, PictureType: "A"},
+}
+
 type ACard struct {
 	Suit        string // club,diamond,heart,spade
 	PictureCard bool
@@ -80,8 +93,8 @@ func Gendeck() CardDeck {
 
 func (d *CardDeck) ShuffleCard() {
 	deckSize := len(d.Cards)
-	opos := rand.Intn(deckSize - 1)
-	npos := rand.Intn(deckSize - 1)
+	opos := rand.Intn(deckSize)
+	npos := rand.Intn(deckSize)
 	tc := d.Cards[opos]
 	interdeck := slices.Delete(d.Cards, opos, opos+1)
 	interdeck = slices.Insert(interdeck, npos, tc)
