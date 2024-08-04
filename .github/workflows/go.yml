@@ -22,7 +22,7 @@ jobs:
         go-version: '1.22'
 
     - name: Test
-      run: go test -C pkg
+      run: go test -C pkg -v
 
     - name: Build
       run: go build -C cmd
