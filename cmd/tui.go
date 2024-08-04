@@ -74,18 +74,13 @@ func (instance *RoundInstance) GameLoop() {
 }
 
 func main() {
-	fmt.Println("vim-go")
 	//fmt.Println(CardSuit["diamond"])
 	//c := gencard()
 	//fmt.Println(c.String())
-	for i := 0; i < 40; i++ {
-		d := libbj.Gendeck()
-		d.ShuffleLots()
-		fmt.Println(d)
-	}
 
 	d := libbj.Gendeck()
 	d.ShuffleLots()
+
 	ri := RoundInstance{}
 	ri.Round = &libbj.BlackJackRound{}
 	ri.Round.Cards = d.Cards
