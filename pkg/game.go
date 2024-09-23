@@ -2,10 +2,7 @@ package pkg
 
 import (
 	"errors"
-	"fmt"
-	"os"
 	"slices"
-	"strconv"
 )
 
 type BlackJackRound struct {
@@ -159,92 +156,14 @@ func (bj *BlackJackRound) Play(action int) error {
 	return nil
 }
 
-func (bj *BlackJackRound) StateTransit(input string) {
-	switch bj.State {
-	case 0:
-		bj.TakeBet(input)
-		if bj.PlayerBet > 0 { // can only advance if valid bet is placed, if any other reason a bet hasn't been set player will retry on next gameloop
-			bj.DealHand()
-			bj.SetPostDealState()
-		} else {
-			bj.nextPlayerQuery = "enter bet as integer number"
-		}
-	case 10:
-		bj.HandleNormCards(input)
-	case 20:
-		bj.HandleNormCards(input)
-
-	case 30:
-		os.Exit(0)
-	case 31:
-		os.Exit(0)
-	case 32:
-		os.Exit(0)
-	case 33:
-		os.Exit(0)
-
-	default:
-		fmt.Println("ummM")
-		// gamestart
-		// request initial bet
-	}
+func (bj *BlackJackRound) InitDeck() {
+	d := Gendeck()
+	d.ShuffleLots()
+	bj.Cards = d.Cards
 }
 
-func GameEnd(message string) {
-	fmt.Println(message)
-	os.Exit(0)
-}
-
-func (bj *BlackJackRound) SetPostDealState() {
-	// add in insurance buy offer on ace card 1
-	// add in player blackjack check
-	bj.State = 10
-	bj.nextPlayerQuery = "H(i)t, H(o)ld or (D)ouble"
-}
-
-func (bj *BlackJackRound) TakeBet(input string) error {
-	if input == "" {
-		return nil
-	}
-	val, err := strconv.Atoi(input)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	if val > 0 {
-		bj.PlayerBet += val
-	}
-	return nil
-}
-
-func (bj *BlackJackRound) HandleNormCards(input string) {
-	switch input {
-	case "i":
-		bj.DealPlayer()
-		if BlackJackHandBestValue(bj.PlayerHand) > 21 {
-			bj.State = 21
-			GameEnd("Bust")
-		} else {
-			bj.State = 20
-		}
-	case "o":
-		bj.DealDealer()
-		DealerHand := BlackJackHandBestValue(bj.DealerHand)
-		if DealerHand > 21 {
-			bj.State = 33
-			bj.nextPlayerQuery = "Dealerbust u win"
-		}
-		res := BlackJackHandBestValue(bj.PlayerHand) - DealerHand
-		if res > 0 {
-			bj.State = 30
-			bj.nextPlayerQuery = "You beat the dealer!"
-		} else if res == 0 {
-			bj.State = 31
-			bj.nextPlayerQuery = "Push, you draw"
-		} else {
-			bj.State = 32
-			bj.nextPlayerQuery = "You loose"
-		}
-	default:
-	}
+func NewRound() *BlackJackRound {
+	round := BlackJackRound{}
+	round.InitDeck()
+	return &round
 }

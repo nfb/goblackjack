@@ -2,10 +2,12 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strconv"
 
+	"github.com/nfb/goblackjack/api"
 	libbj "github.com/nfb/goblackjack/pkg"
 )
 
@@ -73,11 +75,7 @@ func (instance *RoundInstance) GameLoop() {
 	}
 }
 
-func main() {
-	//fmt.Println(CardSuit["diamond"])
-	//c := gencard()
-	//fmt.Println(c.String())
-
+func startTuiGame() {
 	d := libbj.Gendeck()
 	d.ShuffleLots()
 
@@ -86,4 +84,19 @@ func main() {
 	ri.Round.Cards = d.Cards
 	//ri.Round.Cards = libbj.RiggedDeck
 	ri.GameLoop()
+}
+
+func main() {
+	//fmt.Println(CardSuit["diamond"])
+	//c := gencard()
+	//fmt.Println(c.String())
+	var apiserver *bool
+	apiserver = flag.Bool("apiserver", false, "--apiserver starts the api server")
+	flag.Parse()
+	fmt.Println("apiserver is:", *apiserver)
+	if *apiserver {
+		api.StartAPI()
+	} else {
+		startTuiGame()
+	}
 }
