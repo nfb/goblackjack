@@ -9,7 +9,7 @@ type BlackJackRound struct {
 	Cards            []ACard
 	PlayerHand       []ACard
 	DealerHand       []ACard
-	dealerBottomCard ACard
+	DealerBottomCard ACard
 	PlayerBet        int
 	State            int
 	nextPlayerQuery  string
@@ -17,6 +17,17 @@ type BlackJackRound struct {
 	// (first deal)  10: first Cards dealt normal, 11: player blackjack
 	// (second deal) 20: post hit not bust, 21: player 21 (non blackjack)
 	// (end State)   30: win, 31: push, 32: loose, 33: blackjack
+}
+
+// We need a clean state to send to the user so they can't cheat by knowing the
+// upcoming cards
+type ViewableState struct {
+	PlayerHand       []ACard
+	DealerHand       []ACard
+	DealerBottomCard ACard
+	PlayerBet        int
+	State            int
+	nextPlayerQuery  string
 }
 
 // actions values map as follows 0 nilbet?, 1 hit, 2 stand, 3 split, 4 double
@@ -65,12 +76,12 @@ func (bj *BlackJackRound) DealHand() {
 	bj.DealDealer()
 	bj.DealPlayer()
 	bj.DealDealer()
-	bj.dealerBottomCard = bj.DealerHand[0]
+	bj.DealerBottomCard = bj.DealerHand[0]
 	bj.DealerHand = bj.DealerHand[1:]
 }
 
 func (bj *BlackJackRound) PlayDealer() {
-	bj.DealerHand = append(bj.DealerHand, bj.dealerBottomCard)
+	bj.DealerHand = append(bj.DealerHand, bj.DealerBottomCard)
 	for BlackJackHandBestValue(bj.DealerHand) < 17 {
 		bj.DealDealer()
 	}
