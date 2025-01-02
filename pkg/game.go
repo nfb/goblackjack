@@ -19,17 +19,6 @@ type BlackJackRound struct {
 	// (end State)   30: win, 31: push, 32: loose, 33: blackjack
 }
 
-// We need a clean state to send to the user so they can't cheat by knowing the
-// upcoming cards
-type ViewableState struct {
-	PlayerHand       []ACard
-	DealerHand       []ACard
-	DealerBottomCard ACard
-	PlayerBet        int
-	State            int
-	nextPlayerQuery  string
-}
-
 // actions values map as follows 0 nilbet?, 1 hit, 2 stand, 3 split, 4 double
 // the key represents the game State
 var StateActions map[int][]int = map[int][]int{
@@ -165,6 +154,11 @@ func (bj *BlackJackRound) Play(action int) error {
 	}
 	bj.UpdateState()
 	return nil
+}
+
+func (bj *BlackJackRound) CurrentViewableState() BlackJackRound {
+	clientState := BlackJackRound{PlayerBet: bj.PlayerBet, PlayerHand: bj.PlayerHand, DealerHand: bj.DealerHand, State: bj.State}
+	return clientState
 }
 
 func (bj *BlackJackRound) InitDeck() {
