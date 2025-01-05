@@ -35,6 +35,11 @@ function clearButtons(){
 }
 
 function createButtons(){
+  const hitbuttonparent = document.createElement("li");
+  const hitbutton = document.createElement("button");
+  hitbutton.name = "hit";
+  hitbuttonparent.appendChild(hitbutton);
+  document.querySelector("#playerbuttons").appendChild(card);
 }
 
 function renderGame(round){
