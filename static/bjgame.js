@@ -16,15 +16,40 @@ function clearCards(){
   }
 }
 
+function clearDealerCards(){
+  for (i=document.querySelector("#dealercards").childNodes.length-1;i>=0;i--) {
+    document.querySelector("#dealercards").childNodes[i].remove()
+  }
+}
+
+function clearPlayerCards(){
+  for (i=document.querySelector("#yourcards").childNodes.length-1;i>=0;i--) {
+  document.querySelector("#yourcards").childNodes[i].remove()
+  }
+}
+
+function clearButtons(){
+  for (i=document.querySelector("#playerbuttons").childNodes.length-1;i>=0;i--) {
+  document.querySelector("#playerbuttons").childNodes[i].remove()
+  }
+}
+
+function createButtons(){
+}
 
 function renderGame(round){
   console.log(round);
+  clearPlayerCards();
   for (var i=0;i<round["PlayerHand"].length;i++){
     createCard(true,round["PlayerHand"][i]);
   }
+  clearDealerCards();
   for (i=0;i<round["DealerHand"].length;i++){
     createCard(false,round["DealerHand"][i]);
   }
+
+  clearButtons()
+  if (round["State"] == 10 || round["State"] == 20) {  
 
 }
 

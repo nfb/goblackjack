@@ -1,16 +1,13 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/nfb/goblackjack/pkg"
-	"github.com/redis/go-redis/v9"
 )
 
 type PlayerView struct {
@@ -68,33 +65,30 @@ func playGame(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	i, err := strconv.Atoi(string(body))
+	playerCommand, err := strconv.Atoi(string(body))
 	if err != nil {
 		slog.Info(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	slog.Info("Recieved command", i)
+	slog.Info("Recieved command", playerCommand)
 
-	// round, err := pkg.LoadFromRedis()
-	var round pkg.BlackJackRound
-	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-	ctx := context.Background()
-	resp := client.Get(ctx, "game")
-	roundBytes, err := resp.Bytes()
+	round, err := pkg.LoadFromRedis()
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		err = json.Unmarshal(roundBytes, &round)
-		if err != nil {
-			fmt.Println(err)
-		}
-		w.Write(roundBytes)
+		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error("Failed Load from Redis, returing 500")
+		return
 	}
+	round.Play(playerCommand)
+
+	roundBytes, err := json.Marshal(round.CurrentViewableState())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error("Failed encoding round, returing 500")
+		return
+	}
+	w.Write(roundBytes)
+
 }
 
 func StartAPI() {
