@@ -7,7 +7,7 @@ func TestDealTo17(t *testing.T) {
 	// Confirm PlayDealer will hit up to 17
 	var testRound BlackJackRound
 	testRound.DealerHand = append(testRound.DealerHand, ACard{PictureCard: false, NumericRank: 1})
-	testRound.dealerBottomCard = ACard{PictureCard: false, NumericRank: 1}
+	testRound.DealerBottomCard = ACard{PictureCard: false, NumericRank: 1}
 	testRound.PlayerHand = append(testRound.PlayerHand, ACard{PictureCard: false, NumericRank: 1})
 	testRound.PlayerHand = append(testRound.PlayerHand, ACard{PictureCard: false, NumericRank: 1})
 	for i := 1; i < 24; i++ {
